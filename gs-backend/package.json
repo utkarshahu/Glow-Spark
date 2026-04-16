@@ -1,4 +1,6 @@
-{
+{ "engine":{
+  "node":"23.5.0"
+},
   "name": "jsom-e-com",
   "version": "1.0.0",
   "description": "",
