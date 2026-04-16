@@ -1,84 +1,122 @@
-import React, {useCallback, useState} from 'react'
-import {Link, useHistory} from 'react-router-dom'
-import {Api} from '../../utils/Api'
-import {setToken} from '../../utils/localstorage'
-import './signIn.css'
+import React, { useCallback, useState } from "react";
+import { Link, useHistory } from "react-router-dom";
+import { Api } from "../../utils/Api";
+import { setToken } from "../../utils/localstorage";
+
 function Index() {
-  const {replace, push} = useHistory()
-  const [email, setEmail] = useState()
-  const [password, setPassword] = useState()
-  const [loading, setLoading] = useState(false)
+  const { replace, push } = useHistory();
+
+  // ✅ Fix: default values
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const _handleSubmit = useCallback(async () => {
-    // callback
     if (email.length > 2 && password.length > 2) {
-      setLoading(true)
-      const {statusCode, data} = await Api.postRequest('/api/user/signin', {
-        email,
+      setLoading(true);
 
-        password,
-      })
-      setLoading(false)
-      if (statusCode === 400 || statusCode === 500 || statusCode === 403) {
-        setLoading(false)
-        alert(data)
-        return
+      const { statusCode, data } = await Api.postRequest(
+        "/api/user/signin",
+        { email, password }
+      );
+
+      setLoading(false);
+
+      if ([400, 403, 500].includes(statusCode)) {
+        alert(data);
+        return;
       }
-      const {token} = JSON.parse(data)
-      setToken(token)
-      replace('/')
-    }
-  }, [email, password, replace])
 
-  if (loading) return <h1>Loading.....</h1>
+      const { token } = JSON.parse(data);
+      setToken(token);
+      replace("/");
+    } else {
+      alert("Please enter valid email and password");
+    }
+  }, [email, password, replace]);
+
+  // ✅ Loading UI
+  if (loading) {
+    return (
+      <div className="flex justify-center items-center h-screen">
+        <p className="text-gray-500 text-lg animate-pulse">
+          Signing in...
+        </p>
+      </div>
+    );
+  }
+
   return (
-    <div className="signinscreen">
-      <div className="container">
-        <div className="innerContainer">
-          <div
-            style={{
-              display: 'flex',
-              justifyContent: 'space-between',
-              alignItems: 'center',
-              marginBottom: '20px',
-              // backgroundColor: 'red',
-            }}
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-50 to-gray-100 px-4">
+
+      <div className="w-full max-w-md bg-white/80 backdrop-blur-md rounded-3xl shadow-xl p-8 border border-gray-100">
+
+        {/* Header */}
+        <div className="flex items-center justify-between mb-6">
+          <button
+            onClick={() => push("/")}
+            className="text-gray-500 hover:text-gray-800 text-xl transition"
           >
-            <div style={{cursor: 'pointer'}} onClick={() => push('/')}>
-              <i class="fas fa-arrow-circle-left fa-5x"></i>
-            </div>
-            <p>Sign In</p>
+            ←
+          </button>
+
+          <h2 className="text-xl font-semibold text-gray-800">
+            Sign In
+          </h2>
+
+          <div></div>
+        </div>
+
+        {/* Form */}
+        <div className="space-y-5">
+
+          {/* Email */}
+          <div>
+            <label className="text-sm text-gray-600">
+              Email
+            </label>
+            <input
+              type="email"
+              placeholder="Enter your email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              className="mt-1 w-full px-4 py-2 rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
           </div>
 
-          <label for="email">Email</label>
-          <input
-            type="email"
-            id="lname"
-            name="email"
-            placeholder="Your email.."
-            value={email}
-            onChange={e => setEmail(e.target.value)}
-          />
-          <label for="password">Password</label>
-          <input
-            type="password"
-            id="lname"
-            name="password"
-            placeholder="Your Password.."
-            value={password}
-            onChange={e => setPassword(e.target.value)}
-          />
+          {/* Password */}
+          <div>
+            <label className="text-sm text-gray-600">
+              Password
+            </label>
+            <input
+              type="password"
+              placeholder="Enter your password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              className="mt-1 w-full px-4 py-2 rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
+          </div>
 
-          <Link to="/signup" className="link">
-            <span>Creat a new account ?</span>
+          {/* Link */}
+          <Link
+            to="/signup"
+            className="text-sm text-blue-600 hover:underline"
+          >
+            Create a new account
           </Link>
-          <br />
 
-          <input type="submit" value="Sign in" onClick={_handleSubmit} />
+          {/* Button */}
+          <button
+            onClick={_handleSubmit}
+            className="w-full py-3 rounded-xl bg-gradient-to-r from-blue-600 to-blue-500 text-white font-semibold hover:shadow-lg hover:scale-[1.02] transition"
+          >
+            Sign In
+          </button>
         </div>
       </div>
     </div>
-  )
+  );
 }
 
-export default Index
+export default Index;

@@ -1,4 +1,4 @@
-import "./CartScreen.css";
+
 import { useSelector, useDispatch } from "react-redux";
 import { Link } from "react-router-dom";
 
@@ -39,48 +39,88 @@ const CartScreen = () => {
   const handleProceedBtn = () => {
     alert("Functionality pending please stay tune, will be add soon.");
   };
+if (loginInfo.loading) {
+  return (
+    <div className="flex justify-center items-center h-40">
+      <p className="text-gray-500 text-lg animate-pulse">Loading...</p>
+    </div>
+  );
+}
 
-  if (loginInfo.loading) return <h1>Loading.....</h1>;
-  else if (!loginInfo.loading && loginInfo.isLogin)
-    return (
-      <>
-        <div className="cartscreen">
-          <div className="cartscreen__left">
-            <h2>Shopping Cart</h2>
+if (!loginInfo.loading && loginInfo.isLogin)
+  return (
+    <div className="max-w-7xl mx-auto px-4 py-8">
 
-            {cartItems.length === 0 ? (
-              <div>
-                Your Cart Is Empty <Link to="/">Go Back</Link>
-              </div>
-            ) : (
-              cartItems.map((item) => (
+      {/* Title */}
+      <h2 className="text-2xl md:text-3xl font-semibold text-gray-800 mb-6">
+        Shopping Cart
+      </h2>
+
+      <div className="grid lg:grid-cols-3 gap-8">
+
+        {/* LEFT - CART ITEMS */}
+        <div className="lg:col-span-2 space-y-4">
+
+          {cartItems.length === 0 ? (
+            <div className="bg-white p-6 rounded-2xl shadow text-center">
+              <p className="text-gray-500 mb-2">Your cart is empty</p>
+              <Link
+                to="/"
+                className="text-blue-600 font-medium hover:underline"
+              >
+                Go Back
+              </Link>
+            </div>
+          ) : (
+            cartItems.map((item) => (
+              <div
+                key={item.product}
+                className="bg-white p-4 rounded-2xl shadow-sm hover:shadow-md transition"
+              >
                 <CartItem
-                  key={item.product}
                   item={item}
                   qtyChangeHandler={qtyChangeHandler}
                   removeHandler={() => removeFromCartHandler(item)}
                 />
-              ))
-            )}
+              </div>
+            ))
+          )}
+        </div>
+
+        {/* RIGHT - SUMMARY */}
+        <div className="bg-white rounded-2xl shadow-md p-6 h-fit">
+
+          <h3 className="text-lg font-semibold text-gray-800 mb-4">
+            Order Summary
+          </h3>
+
+          <div className="flex justify-between text-gray-600 mb-2">
+            <span>Items ({getCartCount()})</span>
+            <span>${getCartSubTotal()}</span>
           </div>
 
-          <div className="cartscreen__right">
-            <div className="cartscreen__info">
-              <p>Subtotal ({getCartCount()}) items</p>
-              <p>${getCartSubTotal()}</p>
-            </div>
-            <div>
-              <button
-                title="Functionality need to be add."
-                onClick={handleProceedBtn}
-              >
-                Proceed To Checkout
-              </button>
-            </div>
+          <div className="w-full h-[1px] bg-gray-100 my-4"></div>
+
+          <div className="flex justify-between text-lg font-semibold text-gray-800">
+            <span>Total</span>
+            <span>${getCartSubTotal()}</span>
           </div>
+
+          <button
+            onClick={handleProceedBtn}
+            disabled={cartItems.length === 0}
+            className={`mt-6 w-full py-3 rounded-xl font-medium transition ${
+              cartItems.length === 0
+                ? "bg-gray-300 cursor-not-allowed"
+                : "bg-gradient-to-r from-blue-600 to-blue-500 text-white hover:shadow-lg hover:scale-[1.02]"
+            }`}
+          >
+            Proceed to Checkout
+          </button>
         </div>
-      </>
-    );
+      </div>
+    </div>
+  );
 };
 
 export default CartScreen;

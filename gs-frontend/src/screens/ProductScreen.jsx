@@ -1,4 +1,3 @@
-import './ProductScreen.css'
 import {useState, useEffect} from 'react'
 import {useSelector, useDispatch} from 'react-redux'
 
@@ -31,56 +30,90 @@ const ProductScreen = ({match, history}) => {
   }
 
   return (
-    <div className="productscreen">
-      {loading ? (
-        <h2>Loading...</h2>
-      ) : error ? (
-        <h2>{error}</h2>
-      ) : (
-        <>
-          <div className="productscreen__left">
-            <div className="left__image">
-              <img src={product.imageUrl} alt={product.name} />
-            </div>
-            <div className="left__info">
-              <p className="left__name">{product.name}</p>
-              <p>Price: ${product.price}</p>
-              <p>Description: {product.description}</p>
-            </div>
+  <div className="max-w-6xl mx-auto px-4 py-8">
+    {loading ? (
+      <h2 className="text-center text-lg">Loading...</h2>
+    ) : error ? (
+      <h2 className="text-center text-red-500">{error}</h2>
+    ) : (
+      <div className="grid md:grid-cols-2 gap-10">
+
+        {/* LEFT - IMAGE */}
+        <div className="bg-white rounded-3xl shadow-md p-6 flex justify-center items-center">
+          <img
+            src={product.imageUrl}
+            alt={product.name}
+            className="max-h-[400px] object-contain hover:scale-105 transition duration-300"
+          />
+        </div>
+
+        {/* RIGHT - INFO */}
+        <div className="bg-white rounded-3xl shadow-md p-6 space-y-5">
+
+          {/* Title */}
+          <h1 className="text-2xl font-semibold text-gray-800">
+            {product.name}
+          </h1>
+
+          {/* Price */}
+          <div className="text-2xl font-bold text-blue-600">
+            ${product.price}
           </div>
-          <div className="productscreen__right">
-            <div className="right__info">
-              <p>
-                Price:
-                <span>${product.price}</span>
-              </p>
-              <p>
-                Status:
-                <span>
-                  {product.countInStock > 0 ? 'In Stock' : 'Out of Stock'}
-                </span>
-              </p>
-              <p>
-                Qty
-                <select value={qty} onChange={e => setQty(e.target.value)}>
-                  {[...Array(product.countInStock).keys()].map(x => (
-                    <option key={x + 1} value={x + 1}>
-                      {x + 1}
-                    </option>
-                  ))}
-                </select>
-              </p>
-              <p>
-                <button type="button" onClick={addToCartHandler}>
-                  Add To Cart
-                </button>
-              </p>
-            </div>
+
+          {/* Status */}
+          <div>
+            <span className="text-gray-600">Status: </span>
+            <span
+              className={`font-medium ${
+                product.countInStock > 0
+                  ? "text-green-600"
+                  : "text-red-500"
+              }`}
+            >
+              {product.countInStock > 0 ? "In Stock" : "Out of Stock"}
+            </span>
           </div>
-        </>
-      )}
-    </div>
-  )
+
+          {/* Description */}
+          <p className="text-gray-600 leading-relaxed">
+            {product.description}
+          </p>
+
+          {/* Qty */}
+          {product.countInStock > 0 && (
+            <div className="flex items-center gap-4">
+              <span className="text-gray-700 font-medium">Qty:</span>
+              <select
+                value={qty}
+                onChange={(e) => setQty(e.target.value)}
+                className="border border-gray-300 rounded-lg px-3 py-2  focus:outline-none focus:ring-2 focus:ring-blue-500"
+              >
+                {[...Array(product.countInStock).keys()].map((x) => (
+                  <option  key={x + 1} value={x + 1}>
+                    {x + 1}
+                  </option>
+                ))}
+              </select>
+            </div>
+          )}
+
+          {/* Button */}
+          <button
+            onClick={addToCartHandler}
+            disabled={product.countInStock === 0}
+            className={`w-full py-3 rounded-xl font-semibold transition ${
+              product.countInStock === 0
+                ? "bg-gray-300 cursor-not-allowed"
+                : "bg-gradient-to-r from-blue-600 to-blue-500 text-white hover:shadow-lg hover:scale-[1.02]"
+            }`}
+          >
+            Add To Cart
+          </button>
+        </div>
+      </div>
+    )}
+  </div>
+);
 }
 
 export default ProductScreen
